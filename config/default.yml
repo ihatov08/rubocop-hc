@@ -3,7 +3,7 @@
 Hc/RailsSpecificActionName:
   Description: |
     Use only specific action names.
-  Enabled: false
+  Enabled: true
   ActionNames:
     - create
     - destroy
