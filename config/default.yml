@@ -1,6 +1,16 @@
 # Write it!
 
 Hc/RailsSpecificActionName:
-  Description: 'TODO: Write a description of the cop.'
-  Enabled: pending
-  VersionAdded: '<<next>>'
+  Description: |
+    Use only specific action names.
+  Enabled: false
+  ActionNames:
+    - create
+    - destroy
+    - edit
+    - index
+    - new
+    - show
+    - update
+  Include:
+    - app/controllers/**/*.rb

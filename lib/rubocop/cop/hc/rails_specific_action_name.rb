@@ -43,27 +43,48 @@ module RuboCop
       #   good_foo_method(args)
       #
       class RailsSpecificActionName < Base
-        # TODO: Implement the cop in here.
-        #
-        # In many cases, you can use a node matcher for matching node pattern.
-        # See https://github.com/rubocop/rubocop-ast/blob/master/lib/rubocop/ast/node_pattern.rb
-        #
-        # For example
-        MSG = 'Use `#good_method` instead of `#bad_method`.'
+        include VisibilityHelp
 
-        # TODO: Don't call `on_send` unless the method name is in this list
-        # If you don't need `on_send` in the cop you created, remove it.
-        RESTRICT_ON_SEND = %i[bad_method].freeze
+        MSG = 'Use only specific action names.'
 
-        # @!method bad_method?(node)
-        def_node_matcher :bad_method?, <<~PATTERN
-          (send nil? :bad_method ...)
-        PATTERN
+        # @param node [RuboCop::AST::DefNode]
+        # @return [void]
+        def on_def(node)
+          return unless bad?(node)
 
-        def on_send(node)
-          return unless bad_method?(node)
+          add_offense(
+            node.location.name,
+            message: format(
+              'Use only specific action names (%<action_names>s).',
+              action_names: configured_action_names.join(', ')
+            )
+          )
+        end
 
-          add_offense(node)
+        private
+
+        # @param node [RuboCop::AST::DefNode]
+        # @return [Boolean]
+        def action?(node)
+          node_visibility(node) == :public
+        end
+
+        # @param node [RuboCop::AST::DefNode]
+        # @return [Boolean]
+        def bad?(node)
+          action?(node) &&
+            !configured_action_name?(node)
+        end
+
+        # @param node [RuboCop::AST::DefNode]
+        # @return [Boolean]
+        def configured_action_name?(node)
+          configured_action_names.include?(node.method_name.to_s)
+        end
+
+        # @return [Array<String>]
+        def configured_action_names
+          cop_config['ActionNames']
         end
       end
     end
