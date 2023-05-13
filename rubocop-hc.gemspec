@@ -4,7 +4,7 @@ require_relative "lib/rubocop/hc/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rubocop-hc"
-  spec.version = Rubocop::Hc::VERSION
+  spec.version = RuboCop::Hc::VERSION
   spec.authors = ["Tomoya Yoshida"]
   spec.email = ["ihatov08@gmail.com"]
 
@@ -35,4 +35,7 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
+
+  spec.add_runtime_dependency 'rubocop'
 end
+
