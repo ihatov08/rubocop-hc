@@ -1,21 +1,66 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Hc::RailsSpecificActionName, :config do
-  let(:config) { RuboCop::Config.new }
+  context 'when non configured name is used for private method' do
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        class UsersController < ApplicationController
+          private
 
-  # TODO: Write test code
-  #
-  # For example
-  it 'registers an offense when using `#bad_method`' do
-    expect_offense(<<~RUBY)
-      bad_method
-      ^^^^^^^^^^ Use `#good_method` instead of `#bad_method`.
-    RUBY
+          def articles
+          end
+        end
+      RUBY
+    end
   end
 
-  it 'does not register an offense when using `#good_method`' do
-    expect_no_offenses(<<~RUBY)
-      good_method
-    RUBY
+  context 'when configured name is used for public method' do
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        class UsersController < ApplicationController
+          def index
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'when manually configured name is used for public method' do
+    let(:cop_config) do
+      { 'ActionNames' => %w[articles] }
+    end
+
+    it 'registers no offense' do
+      expect_no_offenses(<<~RUBY)
+        class UsersController < ApplicationController
+          def articles
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'when non configured name is used for public method' do
+    it 'registers offense' do
+      expect_offense(<<~RUBY)
+        class UsersController < ApplicationController
+          def articles
+              ^^^^^^^^ Use only specific action names (create, destroy, edit, index, new, show, update).
+          end
+        end
+      RUBY
+    end
+  end
+
+  context 'when non configured name is used for public method in a concern module' do
+    it 'registers offense' do
+      expect_offense(<<~RUBY)
+        module UsersConcern
+          def articles
+              ^^^^^^^^ Use only specific action names (create, destroy, edit, index, new, show, update).
+          end
+        end
+      RUBY
+    end
   end
 end
